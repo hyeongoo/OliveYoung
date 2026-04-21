@@ -1,0 +1,24 @@
+serviceAccounts:
+  server:
+    name: amp-irsa-sa
+    create: false
+    annotations:
+      eks.amazonaws.com/role-arn: __PROMETHEUS_IRSA_ROLE__
+
+prometheus:
+  serviceAccount:
+    name: amp-irsa-sa
+  serviceAccountName: amp-irsa-sa
+  prometheusSpec:
+    serviceAccountName: amp-irsa-sa
+    remoteWrite:
+      - url: https://aps-workspaces.${REGION}.amazonaws.com/workspaces/__AMP_WORKSPACE_ID__/api/v1/remote_write
+        sigv4:
+          region: ${REGION}
+        queueConfig:
+          maxSamplesPerSend: 100
+          capacity: 2500
+          maxShards: 200
+
+rbac:
+  create: true
