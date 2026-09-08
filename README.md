@@ -125,11 +125,10 @@
 
 # 4. 기술 이슈와 해결 전략
 
-## 문제 1. [인증 오류 해결] SigV4 인증 정책 충돌 문제를 관리형 서비스(AMP/AMG) 전환으로 해결하여 모니터링 안정성 확보
-
-- **현상:** 직접 설치한 Prometheus와 Grafana 환경에서 AWS Managed Prometheus(AMP) 연동 시, SigV4 인증 정책 이슈로 메트릭 수집 및 대시보드 구성이 중단됨.
-- **해결:** 패킷 및 로그 분석으로 SigV4 인증 구간의 오류를 특정하고, 자체 구축 대신 **Amazon Managed Prometheus(AMP) 및 Managed Grafana(AMG)**로 아키텍처를 전환. IRSA 기반 IAM 정책 재정의를 통해 보안 연동 신뢰성 강화.
-- **결과:** 인증 오류 없는 리전별 메트릭 통합 및 안정적인 모니터링 환경 구축. 동일 구조를 3개 리전에 즉시 배포할 수 있는 표준 운영 모델 수립.
+## 문제 1. [인증 오류 해결] SigV4 연동 복잡성을 AMG 기반 구조로 단순화하여 모니터링 안정성 확보
+- **현상:** Prometheus의 AMP 연동과 직접 구축한 Grafana의 AMP 조회 과정에서 IRSA 및 SigV4 인증 설정 문제가 발생해 메트릭 전송·조회 구성이 불안정해짐.
+- **해결:** ServiceAccount와 IAM 권한, AMP Data Source URL 및 SigV4 인증 설정을 단계적으로 점검하고 Prometheus → AMP 전송 경로를 정상화. 이후 직접 구축 Grafana의 복잡한 SigV4 인증 경로 대신 **Amazon Managed Grafana(AMG)가 AMP를 조회하는 관리형 구조**로 전환.
+- **결과:** Prometheus → AMP → AMG로 이어지는 안정적인 모니터링 경로를 구축하고, 직접 관리하던 Grafana의 SigV4·IAM 인증 복잡도를 제거하여 운영 구조 단순화.
 
 ---
 
