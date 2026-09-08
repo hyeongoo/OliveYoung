@@ -148,7 +148,7 @@
 
 ---
 
-## 문제 3. [배포 자동화] 반복되는 관측 스택 구축 절차를 Bash·AWS CLI·Helm으로 자동화하여 운영 효율성 향상
+## 문제 3. [배포 자동화] 반복되는 관측 스택 구축 절차를 자동화하여 운영 효율성 향상
 
 - **현상:** 로깅·모니터링 환경 구축 시 IAM 설정, AWS 리소스 생성, Fluent Bit·Prometheus 설치 등 반복적인 수동 작업이 필요해 구축 과정이 복잡하고 비효율적이었음.
 - **해결:** Bash 스크립트에서 **AWS CLI, kubectl, Helm 명령을 순차적으로 실행**하도록 구성하여 IRSA 설정부터 AMP, Lambda, S3, Firehose, Fluent Bit, Prometheus, CloudWatch Alarm까지 관측 스택 구축 절차를 자동화.
