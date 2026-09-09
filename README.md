@@ -125,10 +125,10 @@
 
 # 4. 기술 이슈와 해결 전략
 
-## 문제 1. [인증 오류 해결] SigV4 연동 복잡성을 AMG 기반 구조로 단순화하여 모니터링 안정성 확보
-- **현상:** Prometheus의 AMP 연동과 직접 구축한 Grafana의 AMP 조회 과정에서 IRSA 및 SigV4 인증 설정 문제가 발생해 메트릭 전송·조회 구성이 불안정해짐.
-- **해결:** ServiceAccount와 IAM 권한, AMP Data Source URL 및 SigV4 인증 설정을 단계적으로 점검하고 Prometheus → AMP 전송 경로를 정상화. 이후 직접 구축 Grafana의 복잡한 SigV4 인증 경로 대신 **Amazon Managed Grafana(AMG)가 AMP를 조회하는 관리형 구조**로 전환.
-- **결과:** Prometheus → AMP → AMG로 이어지는 안정적인 모니터링 경로를 구축하고, 직접 관리하던 Grafana의 SigV4·IAM 인증 복잡도를 제거하여 운영 구조 단순화.
+## 문제 1. [인증 오류 대응] SigV4 연동 문제를 구간별로 진단하고 AMG 기반 구조로 전환하여 모니터링 안정성 확보
+- **현상:** 직접 구축한 Grafana → AMP 조회 과정에서 invalid SigV4 configuration: invalid auth type 오류가 지속됨.
+- **해결:** SigV4 기능 활성화, IAM Query 권한, AMP Data Source URL 및 인증 설정을 단계적으로 점검하고, AMG를 통해 AMP 자체와 메트릭 조회가 정상임을 검증. 프로젝트 일정 내 멀티 리전 모니터링 완성을 위해 Self-hosted Grafana 대신 Amazon Managed Grafana(AMG)를 최종 조회 계층으로 선택.
+- **결과:** Prometheus → AMP → AMG로 이어지는 모니터링 경로를 구축하고 멀티 리전 메트릭 조회 환경을 완성. 프로젝트 종료 후 설정을 복기하는 과정에서 Self-hosted Grafana의 sigV4AuthType: default 설정이 누락되어 있었음을 확인하여 당시 invalid auth type 오류의 가능성이 높은 원인으로 판단됨.
 
 ---
 
@@ -140,11 +140,11 @@
 
 ---
 
-## 문제 3. [배포 자동화] 반복되는 관측 스택 구축 절차를 자동화하여 운영 효율성 향상
+## 문제 3. [배포 자동화] Terraform 기반 사전 인프라와 Bash·Helm을 연계하여 관측 스택 구축 절차 자동화
 
-- **현상:** 로깅·모니터링 환경 구축 시 IAM 설정, AWS 리소스 생성, Fluent Bit·Prometheus 설치 등 반복적인 수동 작업이 필요해 구축 과정이 복잡하고 비효율적이었음.
+- **현상:** 멀티 리전 관측 환경을 구축할 때 IAM·IRSA 설정, AWS 관측 리소스 구성, Fluent Bit·Prometheus 설치 등 반복적인 수동 작업이 필요해 구축 절차가 복잡하고 비효율적이었음.
 - **해결:** Bash 스크립트에서 **AWS CLI, kubectl, Helm 명령을 순차적으로 실행**하도록 구성하여 IRSA 설정부터 AMP, Lambda, S3, Firehose, Fluent Bit, Prometheus, CloudWatch Alarm까지 관측 스택 구축 절차를 자동화.
-- **결과:** 반복적인 수동 설치 작업을 줄이고, 동일한 절차로 관측 환경을 배포할 수 있는 일관된 자동화 프로세스 확보.
+- **결과:** Terraform으로 준비된 기본 인프라와 관측 자동화 스크립트를 연계하여 반복적인 수동 작업을 줄이고, 동일한 절차를 리전별로 재사용할 수 있는 일관된 관측 스택 배포 프로세스 확보.
 
 ---
 
